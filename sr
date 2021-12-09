@@ -1,0 +1,31 @@
+#!/bin/bash
+
+echo "Rename samples after listening to them."
+echo "Enter the new name of the sample (without extension), or press [ENTER] to keep the current filename."
+echo "Press [r][ENTER] to replay the current file"
+
+MASK="*.wav"
+if [[ $1 ]]; then
+	MASK=$1
+fi
+
+for f in $MASK; do
+	NEXT=0
+	while [[ $NEXT -eq 0 ]]; do
+		afplay "$f"
+		read -p "$f: " NEW_NAME
+		if [[ "$NEW_NAME" == "r" ]]; then
+			NEXT=0
+		elif [[ -z "$NEW_NAME" ]]; then
+			NEXT=1
+		elif [[ -e "$NEW_NAME.wav" ]]; then
+			echo "File already exists: $NEW_NAME.wav" 
+			NEXT=0
+		else
+			# Rename the file
+			echo "Renaming to $NEW_NAME.wav"
+			mv "$f" "$NEW_NAME.wav"
+			NEXT=1
+		fi
+	done
+done
